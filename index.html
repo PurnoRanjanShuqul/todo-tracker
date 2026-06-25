@@ -1,1360 +1,1172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📚 Topic Tracker Pro</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  :root {
-    --bg-primary: #0f0f1a;
-    --bg-secondary: #1a1a2e;
-    --bg-card: #16213e;
-    --bg-input: #1a1a2e;
-    --text-primary: #e0e0ff;
-    --text-secondary: #a0a0c0;
-    --accent-1: #e94560;
-    --accent-2: #0f3460;
-    --accent-3: #533483;
-    --accent-4: #e94560;
-    --gradient-1: linear-gradient(135deg, #e94560, #533483);
-    --gradient-2: linear-gradient(135deg, #0f3460, #533483);
-    --gradient-3: linear-gradient(135deg, #e94560, #0f3460);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 20px rgba(233, 69, 96, 0.15);
-    --border: rgba(255, 255, 255, 0.05);
-    --success: #00e676;
-    --warning: #ffab00;
-    --danger: #ff1744;
-  }
-
-  [data-theme="light"] {
-    --bg-primary: #f0f2f5;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-input: #f5f5f5;
-    --text-primary: #1a1a2e;
-    --text-secondary: #666680;
-    --accent-1: #e94560;
-    --accent-2: #0f3460;
-    --accent-3: #7c3aed;
-    --accent-4: #e94560;
-    --gradient-1: linear-gradient(135deg, #e94560, #7c3aed);
-    --gradient-2: linear-gradient(135deg, #0f3460, #7c3aed);
-    --gradient-3: linear-gradient(135deg, #e94560, #0f3460);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --shadow-glow: 0 0 20px rgba(233, 69, 96, 0.1);
-    --border: rgba(0, 0, 0, 0.08);
-    --success: #00c853;
-    --warning: #ff8f00;
-    --danger: #d50000;
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .app-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  /* Header */
-  .header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    position: relative;
-  }
-
-  .header h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: var(--gradient-1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    letter-spacing: -1px;
-  }
-
-  .header p {
-    color: var(--text-secondary);
-    font-size: 1rem;
-    font-weight: 400;
-  }
-
-  /* Theme Toggle */
-  .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.4rem;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
-  }
-
-  .theme-toggle:hover {
-    transform: scale(1.1) rotate(20deg);
-    box-shadow: var(--shadow-glow);
-  }
-
-  /* Stats Bar */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-  }
-
-  .stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-  }
-
-  .stat-card:nth-child(1)::before { background: var(--gradient-1); }
-  .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), #00b0ff); }
-  .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--warning), #ff6d00); }
-  .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #7c3aed, #2196f3); }
-
-  .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-glow);
-  }
-
-  .stat-number {
-    font-size: 2rem;
-    font-weight: 800;
-    background: var(--gradient-1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .stat-card:nth-child(2) .stat-number {
-    background: linear-gradient(90deg, var(--success), #00b0ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-
-  .stat-card:nth-child(3) .stat-number {
-    background: linear-gradient(90deg, var(--warning), #ff6d00);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-
-  .stat-card:nth-child(4) .stat-number {
-    background: linear-gradient(90deg, #7c3aed, #2196f3);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 5px;
-    font-weight: 600;
-  }
-
-  /* Overall Progress */
-  .overall-progress {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow);
-  }
-
-  .overall-progress h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-
-  .progress-bar-container {
-    background: var(--bg-input);
-    border-radius: 12px;
-    height: 24px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: var(--gradient-1);
-    border-radius: 12px;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    min-width: 0;
-  }
-
-  .progress-bar-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .progress-text {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--accent-1);
-  }
-
-  /* Input Section */
-  .input-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow);
-  }
-
-  .input-section h2 {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-  }
-
-  .input-group {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-  }
-
-  .input-group input[type="text"],
-  .input-group input[type="url"] {
-    flex: 1;
-    padding: 14px 20px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.3s ease;
-    outline: none;
-  }
-
-  .input-group input:focus {
-    border-color: var(--accent-1);
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
-  }
-
-  .input-group input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.6;
-  }
-
-  .btn {
-    padding: 14px 28px;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-
-  .btn-primary {
-    background: var(--gradient-1);
-    color: white;
-    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(233, 69, 96, 0.4);
-  }
-
-  .btn-danger {
-    background: linear-gradient(135deg, #ff1744, #d50000);
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
-  }
-
-  .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(255, 23, 68, 0.4);
-  }
-
-  .btn-secondary {
-    background: var(--bg-input);
-    color: var(--text-primary);
-    border: 2px solid var(--border);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--accent-1);
-    background: var(--bg-secondary);
-  }
-
-  /* Filter & Actions */
-  .filter-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .filter-tabs {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .filter-tab {
-    padding: 8px 18px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .filter-tab.active {
-    border-color: var(--accent-1);
-    color: var(--accent-1);
-    background: rgba(233, 69, 96, 0.08);
-  }
-
-  .filter-tab:hover {
-    border-color: var(--accent-1);
-    color: var(--accent-1);
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-  }
-
-  .btn-sm {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    border-radius: 10px;
-  }
-
-  /* Topics List */
-  .topics-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .topic-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    animation: slideIn 0.4s ease;
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .topic-card:hover {
-    transform: translateX(4px);
-    box-shadow: var(--shadow-glow);
-  }
-
-  .topic-card.completed {
-    border-left: 4px solid var(--success);
-    opacity: 0.85;
-  }
-
-  .topic-card.completed .topic-name {
-    text-decoration: line-through;
-    opacity: 0.7;
-  }
-
-  .topic-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .topic-checkbox {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    border: 2px solid var(--accent-3);
-    border-radius: 8px;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.3s ease;
-    margin-top: 2px;
-  }
-
-  .topic-checkbox:checked {
-    background: var(--gradient-1);
-    border-color: var(--accent-1);
-  }
-
-  .topic-checkbox:checked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-weight: 800;
-    font-size: 14px;
-  }
-
-  .topic-checkbox:hover {
-    border-color: var(--accent-1);
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
-  }
-
-  .topic-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .topic-name {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-    word-break: break-word;
-    transition: all 0.3s ease;
-  }
-
-  .topic-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--accent-1);
-    text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 500;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-    word-break: break-all;
-    opacity: 0.8;
-  }
-
-  .topic-link:hover {
-    opacity: 1;
-    text-decoration: underline;
-  }
-
-  .topic-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-
-  .confidence-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 200px;
-  }
-
-  .confidence-slider {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 5px;
-    outline: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  .confidence-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-  }
-
-  .confidence-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-  }
-
-  .confidence-badge {
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    min-width: 50px;
-    text-align: center;
-    color: white;
-    transition: all 0.3s ease;
-  }
-
-  .confidence-low { background: linear-gradient(135deg, #ff1744, #ff5252); }
-  .confidence-medium { background: linear-gradient(135deg, #ff8f00, #ffab00); }
-  .confidence-high { background: linear-gradient(135deg, #00c853, #69f0ae); }
-
-  .topic-actions {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-  }
-
-  .btn-icon {
-    width: 34px;
-    height: 34px;
-    border: none;
-    border-radius: 8px;
-    background: var(--bg-input);
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-  }
-
-  .btn-icon:hover {
-    background: rgba(233, 69, 96, 0.15);
-    color: var(--accent-1);
-    transform: scale(1.1);
-  }
-
-  .btn-icon.delete:hover {
-    background: rgba(255, 23, 68, 0.15);
-    color: var(--danger);
-  }
-
-  /* Timestamp */
-  .topic-time {
-    font-size: 0.72rem;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    margin-top: 8px;
-    font-weight: 500;
-  }
-
-  /* Empty State */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-secondary);
-  }
-
-  .empty-state .emoji {
-    font-size: 4rem;
-    margin-bottom: 15px;
-    display: block;
-  }
-
-  .empty-state h3 {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-    color: var(--text-primary);
-  }
-
-  .empty-state p {
-    font-size: 0.9rem;
-    opacity: 0.7;
-  }
-
-  /* Search */
-  .search-box {
-    width: 100%;
-    padding: 12px 20px;
-    padding-left: 45px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.3s ease;
-    outline: none;
-    margin-bottom: 20px;
-  }
-
-  .search-box:focus {
-    border-color: var(--accent-1);
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
-  }
-
-  .search-wrapper {
-    position: relative;
-  }
-
-  .search-wrapper::before {
-    content: '🔍';
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
-    margin-top: -10px;
-  }
-
-  /* Edit Mode */
-  .edit-input {
-    padding: 8px 14px;
-    border: 2px solid var(--accent-1);
-    border-radius: 8px;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    font-family: 'Inter', sans-serif;
-    width: 100%;
-    outline: none;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--accent-3);
-    border-radius: 10px;
-  }
-
-  /* Toast */
-  .toast-container {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .toast {
-    padding: 14px 24px;
-    border-radius: 12px;
-    color: white;
-    font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    animation: toastIn 0.4s ease, toastOut 0.4s ease 2.6s forwards;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .toast.success { background: linear-gradient(135deg, #00c853, #00e676); }
-  .toast.error { background: linear-gradient(135deg, #d50000, #ff1744); }
-  .toast.info { background: linear-gradient(135deg, #2196f3, #42a5f5); }
-
-  @keyframes toastIn {
-    from { opacity: 0; transform: translateX(100px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes toastOut {
-    from { opacity: 1; transform: translateX(0); }
-    to { opacity: 0; transform: translateX(100px); }
-  }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(5px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .modal-overlay.active {
-    display: flex;
-  }
-
-  .modal {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 35px;
-    max-width: 420px;
-    width: 90%;
-    box-shadow: var(--shadow);
-    text-align: center;
-    animation: modalIn 0.3s ease;
-  }
-
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .modal h3 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-  }
-
-  .modal p {
-    color: var(--text-secondary);
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-  }
-
-  .modal-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .modal-buttons .btn {
-    flex: 1;
-    justify-content: center;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .header h1 {
-      font-size: 1.8rem;
-    }
-
-    .input-group {
-      flex-direction: column;
-    }
-
-    .stats-bar {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .filter-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .filter-tabs {
-      justify-content: center;
-    }
-
-    .action-buttons {
-      justify-content: center;
-    }
-
-    .topic-header {
-      flex-direction: column;
-    }
-
-    .topic-actions {
-      align-self: flex-end;
-    }
-
-    .confidence-section {
-      min-width: 150px;
-    }
-
-    .app-container {
-      padding: 10px;
-    }
-
-    .theme-toggle {
-      top: 10px;
-      right: 10px;
-      width: 42px;
-      height: 42px;
-      font-size: 1.1rem;
-    }
-
-    .toast-container {
-      bottom: 15px;
-      right: 15px;
-      left: 15px;
-    }
-  }
-
-  /* Sort indicator */
-  .sort-select {
-    padding: 8px 14px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    font-size: 0.82rem;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-
-  .sort-select:focus {
-    border-color: var(--accent-1);
-  }
-
-  .batch-info {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 15px;
-    font-weight: 500;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.4);
+        }
+
+        /* ---- TABS ---- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+        }
+
+        /* ---- CARD ---- */
+        .card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        /* ---- TAB PANEL ---- */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ---- PANEL HEADER ---- */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .panel-subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .progress-info {
+            text-align: right;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+        }
+
+        /* ---- PROGRESS BAR ---- */
+        .progress-wrap {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* ---- INPUT ROW ---- */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-row input[type="text"] {
+            flex: 1;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: border 0.3s;
+        }
+
+        .input-row input[type="text"]::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .input-row input[type="text"]:focus {
+            border-color: #667eea;
+            background: rgba(255,255,255,0.18);
+        }
+
+        .input-row input[type="date"] {
+            padding: 12px 14px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+        }
+
+        .input-row input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .add-btn {
+            padding: 12px 22px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+        }
+
+        /* ---- FILTERS ---- */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        /* ---- GOAL LIST ---- */
+        .goal-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .goal-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .goal-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .goal-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        /* ---- GOAL ITEM ---- */
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.07);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .goal-item:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .goal-item.completed {
+            opacity: 0.55;
+            border-color: rgba(102,234,141,0.2);
+        }
+
+        .goal-item.overdue {
+            border-left: 3px solid #ff6b6b;
+        }
+
+        /* Custom Checkbox */
+        .goal-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: transparent;
+        }
+
+        .goal-check.checked {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            border-color: transparent;
+        }
+
+        .goal-check .check-icon {
+            color: #fff;
+            font-size: 0.75rem;
+            display: none;
+        }
+
+        .goal-check.checked .check-icon {
+            display: block;
+        }
+
+        /* Goal Info */
+        .goal-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .goal-text {
+            color: #fff;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .goal-item.completed .goal-text {
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .goal-meta {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        .goal-date {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .goal-tag {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .tag-weekly {
+            background: rgba(100,200,255,0.2);
+            color: #64c8ff;
+        }
+
+        .tag-monthly {
+            background: rgba(255,165,100,0.2);
+            color: #ffa564;
+        }
+
+        .tag-yearly {
+            background: rgba(200,100,255,0.2);
+            color: #c864ff;
+        }
+
+        .overdue-label {
+            font-size: 0.7rem;
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        /* Priority Badge */
+        .priority-badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: rgba(255,80,80,0.2);
+            color: #ff6b6b;
+        }
+
+        .priority-medium {
+            background: rgba(255,200,80,0.2);
+            color: #ffc850;
+        }
+
+        .priority-low {
+            background: rgba(80,200,120,0.2);
+            color: #50c878;
+        }
+
+        /* Goal Actions */
+        .goal-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* ---- EMPTY STATE ---- */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        /* ---- STATS ROW ---- */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 3px;
+        }
+
+        /* ---- PRIORITY + DATE ROW ---- */
+        .extra-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .extra-row select {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .extra-row select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        /* ---- TOAST ---- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- EDIT MODAL ---- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 440px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .modal input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .modal select option {
+            background: #1a1a2e;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .modal-btns button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+        @media (max-width: 500px) {
+            .input-row {
+                flex-wrap: wrap;
+            }
+
+            .stats-row {
+                flex-wrap: wrap;
+            }
+
+            .stat-box {
+                min-width: 80px;
+            }
+        }
+    </style>
 </head>
-<body data-theme="dark">
-
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- Reset Confirmation Modal -->
-<div class="modal-overlay" id="resetModal">
-  <div class="modal">
-    <h3>⚠️ Reset Everything?</h3>
-    <p>This will permanently delete all your topics and progress. This action cannot be undone!</p>
-    <div class="modal-buttons">
-      <button class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmReset()">🗑️ Reset All</button>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Single Topic Modal -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <h3>🗑️ Delete Topic?</h3>
-    <p>Are you sure you want to delete this topic?</p>
-    <div class="modal-buttons">
-      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+<body>
 
 <div class="app-container">
-  <!-- Header -->
-  <div class="header">
-    <h1>📚 Topic Tracker Pro</h1>
-    <p>Track your learning journey — stay organized, stay confident!</p>
-  </div>
+    <h1>🎯 Todo Tracker</h1>
 
-  <!-- Stats -->
-  <div class="stats-bar">
-    <div class="stat-card">
-      <div class="stat-number" id="totalCount">0</div>
-      <div class="stat-label">Total Topics</div>
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('daily')">📋 Daily</button>
+        <button class="tab-btn" onclick="switchTab('weekly')">📅 Weekly</button>
+        <button class="tab-btn" onclick="switchTab('monthly')">🗓️ Monthly</button>
+        <button class="tab-btn" onclick="switchTab('yearly')">🏆 Yearly</button>
     </div>
-    <div class="stat-card">
-      <div class="stat-number" id="completedCount">0</div>
-      <div class="stat-label">Completed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number" id="pendingCount">0</div>
-      <div class="stat-label">Pending</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number" id="avgConfidence">0%</div>
-      <div class="stat-label">Avg Confidence</div>
-    </div>
-  </div>
 
-  <!-- Overall Progress -->
-  <div class="overall-progress">
-    <h3>📈 Overall Progress</h3>
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-    </div>
-    <div class="progress-text" id="progressText">0% Complete</div>
-  </div>
+    <div class="card">
 
-  <!-- Input Section -->
-  <div class="input-section">
-    <h2>➕ Add New Topic</h2>
-    <div class="input-group">
-      <input type="text" id="topicInput" placeholder="Enter topic name..." onkeypress="handleKeyPress(event)">
-      <button class="btn btn-primary" onclick="addTopic()">
-        <span>Add</span>
-        <span>📌</span>
-      </button>
-    </div>
-    <div class="input-group">
-      <input type="url" id="linkInput" placeholder="Add resource link (optional)..." onkeypress="handleKeyPress(event)">
-    </div>
-  </div>
+        <!-- ===================== DAILY TAB ===================== -->
+        <div class="tab-panel active" id="panel-daily">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Daily Tasks</div>
+                    <div class="panel-subtitle" id="daily-date-label"></div>
+                </div>
+                <div class="progress-info" id="daily-progress-text">0 / 0</div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="daily-progress-bar"></div>
+            </div>
+            <div class="input-row">
+                <input type="text" id="daily-input" placeholder="Add a daily task..." />
+                <button class="add-btn" onclick="addGoal('daily')">+ Add</button>
+            </div>
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="setFilter('daily','all',this)">All</button>
+                <button class="filter-btn" onclick="setFilter('daily','pending',this)">Pending</button>
+                <button class="filter-btn" onclick="setFilter('daily','completed',this)">Completed</button>
+            </div>
+            <ul class="goal-list" id="daily-list"></ul>
+            <div class="stats-row" id="daily-stats"></div>
+        </div>
 
-  <!-- Search & Filter -->
-  <div class="search-wrapper">
-    <input type="text" class="search-box" id="searchBox" placeholder="Search topics..." oninput="renderTopics()">
-  </div>
+        <!-- ===================== WEEKLY TAB ===================== -->
+        <div class="tab-panel" id="panel-weekly">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Weekly Goals</div>
+                    <div class="panel-subtitle" id="weekly-date-label"></div>
+                </div>
+                <div class="progress-info" id="weekly-progress-text">0 / 0</div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="weekly-progress-bar"></div>
+            </div>
+            <div class="input-row">
+                <input type="text" id="weekly-input" placeholder="Add a weekly goal..." />
+                <input type="date" id="weekly-due" />
+                <button class="add-btn" onclick="addGoal('weekly')">+ Add</button>
+            </div>
+            <div class="extra-row">
+                <select id="weekly-priority">
+                    <option value="medium">🟡 Medium Priority</option>
+                    <option value="high">🔴 High Priority</option>
+                    <option value="low">🟢 Low Priority</option>
+                </select>
+            </div>
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="setFilter('weekly','all',this)">All</button>
+                <button class="filter-btn" onclick="setFilter('weekly','pending',this)">Pending</button>
+                <button class="filter-btn" onclick="setFilter('weekly','completed',this)">Completed</button>
+                <button class="filter-btn" onclick="setFilter('weekly','overdue',this)">Overdue</button>
+            </div>
+            <ul class="goal-list" id="weekly-list"></ul>
+            <div class="stats-row" id="weekly-stats"></div>
+        </div>
 
-  <div class="filter-actions">
-    <div class="filter-tabs">
-      <button class="filter-tab active" onclick="setFilter('all', this)">📋 All</button>
-      <button class="filter-tab" onclick="setFilter('pending', this)">⏳ Pending</button>
-      <button class="filter-tab" onclick="setFilter('completed', this)">✅ Completed</button>
+        <!-- ===================== MONTHLY TAB ===================== -->
+        <div class="tab-panel" id="panel-monthly">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Monthly Goals</div>
+                    <div class="panel-subtitle" id="monthly-date-label"></div>
+                </div>
+                <div class="progress-info" id="monthly-progress-text">0 / 0</div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="monthly-progress-bar"></div>
+            </div>
+            <div class="input-row">
+                <input type="text" id="monthly-input" placeholder="Add a monthly goal..." />
+                <input type="date" id="monthly-due" />
+                <button class="add-btn" onclick="addGoal('monthly')">+ Add</button>
+            </div>
+            <div class="extra-row">
+                <select id="monthly-priority">
+                    <option value="medium">🟡 Medium Priority</option>
+                    <option value="high">🔴 High Priority</option>
+                    <option value="low">🟢 Low Priority</option>
+                </select>
+            </div>
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="setFilter('monthly','all',this)">All</button>
+                <button class="filter-btn" onclick="setFilter('monthly','pending',this)">Pending</button>
+                <button class="filter-btn" onclick="setFilter('monthly','completed',this)">Completed</button>
+                <button class="filter-btn" onclick="setFilter('monthly','overdue',this)">Overdue</button>
+            </div>
+            <ul class="goal-list" id="monthly-list"></ul>
+            <div class="stats-row" id="monthly-stats"></div>
+        </div>
+
+        <!-- ===================== YEARLY TAB ===================== -->
+        <div class="tab-panel" id="panel-yearly">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Yearly Goals</div>
+                    <div class="panel-subtitle" id="yearly-date-label"></div>
+                </div>
+                <div class="progress-info" id="yearly-progress-text">0 / 0</div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="yearly-progress-bar"></div>
+            </div>
+            <div class="input-row">
+                <input type="text" id="yearly-input" placeholder="Add a yearly goal..." />
+                <input type="date" id="yearly-due" />
+                <button class="add-btn" onclick="addGoal('yearly')">+ Add</button>
+            </div>
+            <div class="extra-row">
+                <select id="yearly-priority">
+                    <option value="medium">🟡 Medium Priority</option>
+                    <option value="high">🔴 High Priority</option>
+                    <option value="low">🟢 Low Priority</option>
+                </select>
+            </div>
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="setFilter('yearly','all',this)">All</button>
+                <button class="filter-btn" onclick="setFilter('yearly','pending',this)">Pending</button>
+                <button class="filter-btn" onclick="setFilter('yearly','completed',this)">Completed</button>
+                <button class="filter-btn" onclick="setFilter('yearly','overdue',this)">Overdue</button>
+            </div>
+            <ul class="goal-list" id="yearly-list"></ul>
+            <div class="stats-row" id="yearly-stats"></div>
+        </div>
+
+    </div><!-- end card -->
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <h3>✏️ Edit Goal</h3>
+        <input type="text" id="modal-text" placeholder="Goal text..." />
+        <input type="date" id="modal-due" />
+        <select id="modal-priority">
+            <option value="medium">🟡 Medium Priority</option>
+            <option value="high">🔴 High Priority</option>
+            <option value="low">🟢 Low Priority</option>
+        </select>
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+        </div>
     </div>
-    <div class="action-buttons">
-      <select class="sort-select" id="sortSelect" onchange="renderTopics()">
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="name">By Name</option>
-        <option value="confidence-asc">Confidence ↑</option>
-        <option value="confidence-desc">Confidence ↓</option>
-      </select>
-      <button class="btn btn-danger btn-sm" onclick="openResetModal()">🗑️ Reset</button>
-    </div>
-  </div>
-
-  <div class="batch-info" id="batchInfo"></div>
-
-  <!-- Topics List -->
-  <div class="topics-list" id="topicsList"></div>
 </div>
 
 <script>
-  // State
-  let topics = JSON.parse(localStorage.getItem('topicTracker_topics')) || [];
-  let currentFilter = 'all';
-  let deleteTargetId = null;
+    // =============================================
+    //  STATE
+    // =============================================
+    const TYPES = ['daily', 'weekly', 'monthly', 'yearly'];
 
-  // Theme
-  function initTheme() {
-    const saved = localStorage.getItem('topicTracker_theme') || 'dark';
-    document.body.setAttribute('data-theme', saved);
-    document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
-  }
-
-  function toggleTheme() {
-    const current = document.body.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.body.setAttribute('data-theme', next);
-    localStorage.setItem('topicTracker_theme', next);
-    document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
-    showToast(next === 'dark' ? '🌙 Dark mode activated' : '☀️ Light mode activated', 'info');
-  }
-
-  // Toast
-  function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-  // Save
-  function saveTopics() {
-    localStorage.setItem('topicTracker_topics', JSON.stringify(topics));
-  }
-
-  // Add Topic
-  function addTopic() {
-    const nameInput = document.getElementById('topicInput');
-    const linkInput = document.getElementById('linkInput');
-    const name = nameInput.value.trim();
-    const link = linkInput.value.trim();
-
-    if (!name) {
-      showToast('❌ Please enter a topic name!', 'error');
-      nameInput.focus();
-      return;
-    }
-
-    const topic = {
-      id: Date.now(),
-      name: name,
-      link: link,
-      completed: false,
-      confidence: 0,
-      createdAt: new Date().toISOString()
+    // Each goal: { id, text, completed, due, priority, createdAt }
+    let goals = {
+        daily: [],
+        weekly: [],
+        monthly: [],
+        yearly: []
     };
 
-    topics.unshift(topic);
-    saveTopics();
-    nameInput.value = '';
-    linkInput.value = '';
-    nameInput.focus();
-    renderTopics();
-    updateStats();
-    showToast(`✅ "${name}" added successfully!`);
-  }
+    let filters = {
+        daily: 'all',
+        weekly: 'all',
+        monthly: 'all',
+        yearly: 'all'
+    };
 
-  function handleKeyPress(e) {
-    if (e.key === 'Enter') addTopic();
-  }
+    let editState = { type: null, id: null };
 
-  // Toggle Complete
-  function toggleComplete(id) {
-    const topic = topics.find(t => t.id === id);
-    if (topic) {
-      topic.completed = !topic.completed;
-      saveTopics();
-      renderTopics();
-      updateStats();
-      showToast(topic.completed ? `🎉 "${topic.name}" completed!` : `↩️ "${topic.name}" marked pending`, 'info');
-    }
-  }
+    // =============================================
+    //  INIT
+    // =============================================
+    function init() {
+        loadFromStorage();
+        setDateLabels();
+        setDefaultDueDates();
+        TYPES.forEach(type => renderList(type));
 
-  // Update Confidence
-  function updateConfidence(id, value) {
-    const topic = topics.find(t => t.id === id);
-    if (topic) {
-      topic.confidence = parseInt(value);
-      saveTopics();
-      updateStats();
-      // Update badge
-      const badge = document.getElementById(`badge-${id}`);
-      if (badge) {
-        badge.textContent = value + '%';
-        badge.className = 'confidence-badge ' + getConfidenceClass(value);
-      }
-      // Update slider background
-      updateSliderStyle(id, value);
-    }
-  }
-
-  function getConfidenceClass(val) {
-    if (val < 40) return 'confidence-low';
-    if (val < 70) return 'confidence-medium';
-    return 'confidence-high';
-  }
-
-  function getSliderColor(val) {
-    if (val < 40) return '#ff1744';
-    if (val < 70) return '#ffab00';
-    return '#00e676';
-  }
-
-  function updateSliderStyle(id, val) {
-    const slider = document.getElementById(`slider-${id}`);
-    if (slider) {
-      const color = getSliderColor(val);
-      slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${val}%, var(--bg-input) ${val}%, var(--bg-input) 100%)`;
-      slider.style.setProperty('--thumb-color', color);
-      // Dynamic thumb color via inline style trick
-      const styleId = `style-${id}`;
-      let style = document.getElementById(styleId);
-      if (!style) {
-        style = document.createElement('style');
-        style.id = styleId;
-        document.head.appendChild(style);
-      }
-      style.textContent = `#slider-${id}::-webkit-slider-thumb { background: ${color}; } #slider-${id}::-moz-range-thumb { background: ${color}; }`;
-    }
-  }
-
-  // Delete
-  function deleteTopic(id) {
-    deleteTargetId = id;
-    document.getElementById('deleteModal').classList.add('active');
-  }
-
-  function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('active');
-    deleteTargetId = null;
-  }
-
-  function confirmDelete() {
-    if (deleteTargetId) {
-      const topic = topics.find(t => t.id === deleteTargetId);
-      topics = topics.filter(t => t.id !== deleteTargetId);
-      saveTopics();
-      renderTopics();
-      updateStats();
-      showToast(`🗑️ "${topic?.name}" deleted`, 'error');
-    }
-    closeDeleteModal();
-  }
-
-  // Edit
-  function editTopic(id) {
-    const topic = topics.find(t => t.id === id);
-    if (!topic) return;
-
-    const nameEl = document.getElementById(`name-${id}`);
-    const currentName = topic.name;
-
-    nameEl.innerHTML = `<input type="text" class="edit-input" id="edit-${id}" value="${currentName}" onkeypress="if(event.key==='Enter')saveEdit(${id})" onblur="saveEdit(${id})">`;
-    document.getElementById(`edit-${id}`).focus();
-    document.getElementById(`edit-${id}`).select();
-  }
-
-  function saveEdit(id) {
-    const input = document.getElementById(`edit-${id}`);
-    if (!input) return;
-
-    const newName = input.value.trim();
-    const topic = topics.find(t => t.id === id);
-
-    if (newName && topic) {
-      topic.name = newName;
-      saveTopics();
-      showToast(`✏️ Topic updated!`, 'info');
-    }
-    renderTopics();
-  }
-
-  // Filter
-  function setFilter(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    renderTopics();
-  }
-
-  // Reset
-  function openResetModal() {
-    if (topics.length === 0) {
-      showToast('Nothing to reset!', 'info');
-      return;
-    }
-    document.getElementById('resetModal').classList.add('active');
-  }
-
-  function closeResetModal() {
-    document.getElementById('resetModal').classList.remove('active');
-  }
-
-  function confirmReset() {
-    topics = [];
-    saveTopics();
-    renderTopics();
-    updateStats();
-    closeResetModal();
-    showToast('🗑️ All topics have been reset!', 'error');
-    // Clean up dynamic styles
-    document.querySelectorAll('[id^="style-"]').forEach(el => el.remove());
-  }
-
-  // Format date
-  function formatDate(iso) {
-    const d = new Date(iso);
-    const options = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return d.toLocaleDateString('en-US', options);
-  }
-
-  // Get sorted & filtered topics
-  function getFilteredTopics() {
-    const search = document.getElementById('searchBox').value.toLowerCase();
-    const sort = document.getElementById('sortSelect').value;
-
-    let filtered = [...topics];
-
-    // Filter
-    if (currentFilter === 'completed') filtered = filtered.filter(t => t.completed);
-    if (currentFilter === 'pending') filtered = filtered.filter(t => !t.completed);
-
-    // Search
-    if (search) {
-      filtered = filtered.filter(t =>
-        t.name.toLowerCase().includes(search) ||
-        (t.link && t.link.toLowerCase().includes(search))
-      );
+        // Enter key support
+        TYPES.forEach(type => {
+            document.getElementById(`${type}-input`)
+                .addEventListener('keydown', e => {
+                    if (e.key === 'Enter') addGoal(type);
+                });
+        });
     }
 
-    // Sort
-    switch (sort) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'confidence-asc':
-        filtered.sort((a, b) => a.confidence - b.confidence);
-        break;
-      case 'confidence-desc':
-        filtered.sort((a, b) => b.confidence - a.confidence);
-        break;
+    function setDateLabels() {
+        const now = new Date();
+
+        document.getElementById('daily-date-label').textContent =
+            now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Week range
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        document.getElementById('weekly-date-label').textContent =
+            `${fmtDate(startOfWeek)} – ${fmtDate(endOfWeek)}`;
+
+        document.getElementById('monthly-date-label').textContent =
+            now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        document.getElementById('yearly-date-label').textContent =
+            `Year ${now.getFullYear()}`;
     }
 
-    return filtered;
-  }
+    function setDefaultDueDates() {
+        const now = new Date();
 
-  // Render
-  function renderTopics() {
-    const list = document.getElementById('topicsList');
-    const filtered = getFilteredTopics();
+        // Weekly: end of this week (Sunday)
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() + (6 - now.getDay()));
+        document.getElementById('weekly-due').value = toInputDate(endOfWeek);
 
-    // Batch info
-    const batchInfo = document.getElementById('batchInfo');
-    batchInfo.textContent = `Showing ${filtered.length} of ${topics.length} topics`;
+        // Monthly: end of this month
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        document.getElementById('monthly-due').value = toInputDate(endOfMonth);
 
-    if (filtered.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <span class="emoji">${topics.length === 0 ? '📝' : '🔍'}</span>
-          <h3>${topics.length === 0 ? 'No topics yet!' : 'No matching topics'}</h3>
-          <p>${topics.length === 0 ? 'Start adding topics to track your learning progress.' : 'Try a different search or filter.'}</p>
-        </div>
-      `;
-      return;
+        // Yearly: Dec 31
+        const endOfYear = new Date(now.getFullYear(), 11, 31);
+        document.getElementById('yearly-due').value = toInputDate(endOfYear);
     }
 
-    list.innerHTML = filtered.map((topic, index) => `
-      <div class="topic-card ${topic.completed ? 'completed' : ''}" style="animation-delay: ${index * 0.05}s">
-        <div class="topic-header">
-          <input type="checkbox" class="topic-checkbox" ${topic.completed ? 'checked' : ''} onchange="toggleComplete(${topic.id})" title="Mark as ${topic.completed ? 'pending' : 'completed'}">
-          <div class="topic-content">
-            <div class="topic-name" id="name-${topic.id}">${escapeHtml(topic.name)}</div>
-            ${topic.link ? `<a href="${escapeHtml(topic.link)}" target="_blank" class="topic-link" title="${escapeHtml(topic.link)}">🔗 ${truncateUrl(topic.link)}</a>` : ''}
-            <div class="topic-meta">
-              <div class="confidence-section">
-                <span style="font-size:0.8rem;color:var(--text-secondary);font-weight:600;">Confidence:</span>
-                <input type="range" min="0" max="100" value="${topic.confidence}" class="confidence-slider" id="slider-${topic.id}" oninput="updateConfidence(${topic.id}, this.value)">
-                <span class="confidence-badge ${getConfidenceClass(topic.confidence)}" id="badge-${topic.id}">${topic.confidence}%</span>
-              </div>
-            </div>
-            <div class="topic-time">Added: ${formatDate(topic.createdAt)}</div>
-          </div>
-          <div class="topic-actions">
-            <button class="btn-icon" onclick="editTopic(${topic.id})" title="Edit">✏️</button>
-            <button class="btn-icon delete" onclick="deleteTopic(${topic.id})" title="Delete">🗑️</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
+    function fmtDate(date) {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
 
-    // Apply slider styles
-    filtered.forEach(topic => {
-      setTimeout(() => updateSliderStyle(topic.id, topic.confidence), 10);
+    function toInputDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // =============================================
+    //  STORAGE
+    // =============================================
+    function saveToStorage() {
+        localStorage.setItem('tracker_goals', JSON.stringify(goals));
+    }
+
+    function loadFromStorage() {
+        const data = localStorage.getItem('tracker_goals');
+        if (data) {
+            const parsed = JSON.parse(data);
+            TYPES.forEach(type => {
+                if (parsed[type]) goals[type] = parsed[type];
+            });
+        }
+    }
+
+    // =============================================
+    //  TAB SWITCHING
+    // =============================================
+    function switchTab(type) {
+        // Panels
+        TYPES.forEach(t => {
+            document.getElementById(`panel-${t}`).classList.remove('active');
+        });
+        document.getElementById(`panel-${type}`).classList.add('active');
+
+        // Buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // =============================================
+    //  ADD GOAL
+    // =============================================
+    function addGoal(type) {
+        const input = document.getElementById(`${type}-input`);
+        const text = input.value.trim();
+
+        if (!text) {
+            showToast('⚠️ Please enter a goal!');
+            input.focus();
+            return;
+        }
+
+        const dueEl = document.getElementById(`${type}-due`);
+        const priorEl = document.getElementById(`${type}-priority`);
+
+        const goal = {
+            id: Date.now(),
+            text: text,
+            completed: false,
+            due: dueEl ? dueEl.value : '',
+            priority: priorEl ? priorEl.value : 'medium',
+            createdAt: new Date().toISOString()
+        };
+
+        goals[type].unshift(goal);
+        saveToStorage();
+        renderList(type);
+
+        input.value = '';
+        showToast('✅ Goal added!');
+    }
+
+    // =============================================
+    //  TOGGLE COMPLETE
+    // =============================================
+    function toggleGoal(type, id) {
+        const goal = goals[type].find(g => g.id === id);
+        if (goal) {
+            goal.completed = !goal.completed;
+            if (goal.completed) goal.completedAt = new Date().toISOString();
+            else delete goal.completedAt;
+            saveToStorage();
+            renderList(type);
+            showToast(goal.completed ? '🎉 Goal completed!' : '↩️ Marked as pending');
+        }
+    }
+
+    // =============================================
+    //  DELETE
+    // =============================================
+    function deleteGoal(type, id) {
+        goals[type] = goals[type].filter(g => g.id !== id);
+        saveToStorage();
+        renderList(type);
+        showToast('🗑️ Goal deleted');
+    }
+
+    // =============================================
+    //  EDIT MODAL
+    // =============================================
+    function openEdit(type, id) {
+        const goal = goals[type].find(g => g.id === id);
+        if (!goal) return;
+
+        editState = { type, id };
+        document.getElementById('modal-text').value = goal.text;
+        document.getElementById('modal-due').value = goal.due || '';
+        document.getElementById('modal-priority').value = goal.priority || 'medium';
+        document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.remove('open');
+        editState = { type: null, id: null };
+    }
+
+    function saveEdit() {
+        const { type, id } = editState;
+        if (!type || !id) return;
+
+        const goal = goals[type].find(g => g.id === id);
+        if (!goal) return;
+
+        const newText = document.getElementById('modal-text').value.trim();
+        if (!newText) {
+            showToast('⚠️ Goal text cannot be empty!');
+            return;
+        }
+
+        goal.text = newText;
+        goal.due = document.getElementById('modal-due').value;
+        goal.priority = document.getElementById('modal-priority').value;
+
+        saveToStorage();
+        renderList(type);
+        closeModal();
+        showToast('✏️ Goal updated!');
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
     });
-  }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+    // =============================================
+    //  FILTER
+    // =============================================
+    function setFilter(type, filter, btn) {
+        filters[type] = filter;
 
-  function truncateUrl(url) {
-    try {
-      const u = new URL(url);
-      let display = u.hostname + u.pathname;
-      if (display.length > 50) display = display.substring(0, 50) + '...';
-      return display;
-    } catch {
-      return url.length > 50 ? url.substring(0, 50) + '...' : url;
+        // Update active button
+        const panel = document.getElementById(`panel-${type}`);
+        panel.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        renderList(type);
     }
-  }
 
-  // Update Stats
-  function updateStats() {
-    const total = topics.length;
-    const completed = topics.filter(t => t.completed).length;
-    const pending = total - completed;
-    const avgConf = total > 0 ? Math.round(topics.reduce((sum, t) => sum + t.confidence, 0) / total) : 0;
-    const progressPct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    // =============================================
+    //  IS OVERDUE
+    // =============================================
+    function isOverdue(goal) {
+        if (!goal.due || goal.completed) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const due = new Date(goal.due + 'T00:00:00');
+        return due < today;
+    }
 
-    document.getElementById('totalCount').textContent = total;
-    document.getElementById('completedCount').textContent = completed;
-    document.getElementById('pendingCount').textContent = pending;
-    document.getElementById('avgConfidence').textContent = avgConf + '%';
-    document.getElementById('progressBar').style.width = progressPct + '%';
-    document.getElementById('progressText').textContent = progressPct + '% Complete';
-  }
+    // =============================================
+    //  RENDER
+    // =============================================
+    function renderList(type) {
+        const listEl = document.getElementById(`${type}-list`);
+        const filter = filters[type];
 
-  // Init
-  initTheme();
-  renderTopics();
-  updateStats();
+        let filtered = goals[type].filter(g => {
+            if (filter === 'completed') return g.completed;
+            if (filter === 'pending') return !g.completed;
+            if (filter === 'overdue') return isOverdue(g);
+            return true;
+        });
+
+        // Stats (always from ALL goals)
+        const all = goals[type];
+        const totalAll = all.length;
+        const completedAll = all.filter(g => g.completed).length;
+        const overdueAll = all.filter(g => isOverdue(g)).length;
+        const pct = totalAll ? Math.round((completedAll / totalAll) * 100) : 0;
+
+        // Progress
+        document.getElementById(`${type}-progress-bar`).style.width = pct + '%';
+        document.getElementById(`${type}-progress-text`).textContent =
+            `${completedAll} / ${totalAll} (${pct}%)`;
+
+        // Stats boxes
+        document.getElementById(`${type}-stats`).innerHTML = `
+            <div class="stat-box">
+                <div class="stat-number">${totalAll}</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" style="color:#56ab2f">${completedAll}</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" style="color:#ffc850">${totalAll - completedAll}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            ${type !== 'daily' ? `
+            <div class="stat-box">
+                <div class="stat-number" style="color:#ff6b6b">${overdueAll}</div>
+                <div class="stat-label">Overdue</div>
+            </div>` : ''}
+        `;
+
+        // Render items
+        if (filtered.length === 0) {
+            listEl.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">${getEmptyIcon(filter)}</div>
+                    <p>${getEmptyMsg(filter, type)}</p>
+                </div>`;
+            return;
+        }
+
+        listEl.innerHTML = '';
+
+        filtered.forEach(goal => {
+            const overdue = isOverdue(goal);
+            const li = document.createElement('li');
+            li.className = `goal-item${goal.completed ? ' completed' : ''}${overdue ? ' overdue' : ''}`;
+
+            li.innerHTML = `
+                <div class="goal-check ${goal.completed ? 'checked' : ''}"
+                     onclick="toggleGoal('${type}', ${goal.id})">
+                    <span class="check-icon">✓</span>
+                </div>
+                <div class="goal-info">
+                    <div class="goal-text">${escapeHTML(goal.text)}</div>
+                    <div class="goal-meta">
+                        ${goal.due ? `<span class="goal-date">📅 Due: ${formatDisplayDate(goal.due)}</span>` : ''}
+                        ${overdue ? `<span class="overdue-label">⚠️ Overdue</span>` : ''}
+                        ${goal.completed && goal.completedAt ? `<span class="goal-date">✅ Done: ${formatDisplayDate(goal.completedAt.split('T')[0])}</span>` : ''}
+                        ${type !== 'daily' && goal.priority ? `
+                            <span class="priority-badge priority-${goal.priority}">
+                                ${goal.priority === 'high' ? '🔴' : goal.priority === 'low' ? '🟢' : '🟡'} ${capitalize(goal.priority)}
+                            </span>` : ''}
+                        ${type !== 'daily' ? `<span class="goal-tag tag-${type}">${capitalize(type)}</span>` : ''}
+                    </div>
+                </div>
+                <div class="goal-actions">
+                    <button class="action-btn" onclick="openEdit('${type}', ${goal.id})" title="Edit">✏️</button>
+                    <button class="action-btn" onclick="deleteGoal('${type}', ${goal.id})" title="Delete">🗑️</button>
+                </div>
+            `;
+
+            listEl.appendChild(li);
+        });
+    }
+
+    // =============================================
+    //  HELPERS
+    // =============================================
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function formatDisplayDate(dateStr) {
+        if (!dateStr) return '';
+        const [y, m, d] = dateStr.split('-');
+        const date = new Date(+y, +m - 1, +d);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function getEmptyIcon(filter) {
+        if (filter === 'completed') return '🎉';
+        if (filter === 'overdue') return '✅';
+        return '📭';
+    }
+
+    function getEmptyMsg(filter, type) {
+        if (filter === 'completed') return 'No completed goals yet. Keep going!';
+        if (filter === 'overdue') return 'No overdue goals. Great job!';
+        if (filter === 'pending') return 'No pending goals!';
+        return `No ${type} goals yet. Add one above!`;
+    }
+
+    // =============================================
+    //  TOAST
+    // =============================================
+    let toastTimer;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // =============================================
+    //  KICK OFF
+    // =============================================
+    init();
 </script>
-
 </body>
 </html>
